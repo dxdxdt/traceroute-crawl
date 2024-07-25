@@ -1,0 +1,12 @@
+[Unit]
+Description=Traceroute Crawl
+After=network.target
+
+[Service]
+Type=notify
+EnvironmentFile=/etc/traceroute-crawl/traceroute-crawl.conf
+ExecStart=/usr/local/bin/traceroute-crawl.sh daemon_ns
+KillSignal=SIGCONT
+
+[Install]
+WantedBy=multi-user.target
