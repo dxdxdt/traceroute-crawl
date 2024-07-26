@@ -1,3 +1,8 @@
+# IPv6 Traceroute Crawl
+Make your own "[traceroute
+crawl](https://www.theregister.com/2013/02/15/star_wars_traceroute/)" using the
+IPv6 prefix assigned to your Hetzner server.
+
 ```
 $ traceroute -I -m 128 episode-iv.dev.snart.me
 traceroute to episode-iv.dev.snart.me (2a01:4f9:c011:9670::ffff), 128 hops max, 80 byte packets
@@ -51,3 +56,91 @@ traceroute to episode-iv.dev.snart.me (2a01:4f9:c011:9670::ffff), 128 hops max, 
 75  tribute.to.ipv6.deployment (2a01:4f9:c011:9670::2f)  327.868 ms  327.920 ms  327.905 ms
 76  episode-iv.dev.snart.me (2a01:4f9:c011:9670::ffff)  328.742 ms  327.805 ms  327.800 ms
 ```
+
+## PREREQUISITES
+- A Hetzner server with ...
+  - Systemd
+  - Kernel build with network namespace support(most distros have this)
+  - IPv6 public network
+- The Hetzner API token to modify the server from the script
+
+## INSTALL
+```sh
+dnf install curl tar gzip jq ipcalc
+
+curl -L https://github.com/dxdxdt/traceroute-crawl/archive/refs/tags/r1.tar.gz > traceroute-crawl-r1.tar.gz
+tar xf traceroute-crawl-r1.tar.gz
+cd traceroute-crawl-r1
+
+sudo make install
+```
+
+Edit `/etc/traceroute-crawl/traceroute-crawl.conf`.
+
+
+`AUTH_TOKEN`: the API token from the project security page.
+
+![AUTH_TOKEN on Hetnzer Cloud Console](doc/image-1.png)
+
+`SERVER`: the server number on the overview page
+
+![SERVER on Hetnzer Cloud Console](doc/image.png)
+
+`PREFIX`: from the server networking page
+
+![PREFIX on Hetnzer Cloud Console](doc/image-2.png)
+
+Edit the rest to your liking. Once all set, use the following command to add PTR
+records.
+
+```sh
+# Add the records. Takes a while
+traceroute-crawl add
+# After seeing "OK", wait a few minutes for the records to propagate.
+# To test the records, use
+traceroute-crawl dig
+```
+
+Test the netns set up.
+
+```sh
+# Create and set up netns
+traceroute-crawl mkns
+
+# Check the set up
+ip netns
+ip -6 route
+sudo ip -n ns-0001 -6 addr
+sudo ip -n ns-0001 -6 route
+# ...
+traceroute -I -m 255 2001:db8:574f:4567:abcd::ffff # replace with your $TAIL_ADDR
+
+# Delete all netns
+#  (so that the Systemd service can manage them)
+traceroute-crawl mkns
+```
+
+If everything looks all good, enable and start the service:
+
+```sh
+systemctl enable --now traceroute-crawl.service
+```
+
+## UNINSTALL
+```sh
+# Delete all PTR records matching PREFIX/CIDR
+# WARNING: PREFIX and CIDR must be set correctly or it could end up deleting all
+#  of the records!!!
+traceroute-crawl purge
+
+# Stop and disable the service
+systemctl disable --now traceroute-crawl
+
+# Remove the executables
+sudo make uninstall
+```
+
+## Tips
+You may use the instanced systemd service `traceroute-crawl@.service` to have
+multiple instances. Just make sure you use different `PREFIX` for each
+instances.
