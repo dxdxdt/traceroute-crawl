@@ -1,5 +1,5 @@
 #!/bin/bash
-ENV_FILES="
+[ -z "$ENV_FILES" ] && ENV_FILES="
 ./traceroute-crawl.conf
 /etc/traceroute-crawl/traceroute-crawl.conf
 "
