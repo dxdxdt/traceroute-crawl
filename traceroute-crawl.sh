@@ -38,7 +38,9 @@ hzr_do_add_rdns () {
 	curl -s \
 		"$API_URL/servers/$SERVER/actions/change_dns_ptr" \
 		-H "Authorization: $AUTH_TOKEN" \
-		--json "$doc"
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		--data "$doc"
 }
 
 hzr_do_rm_rdns () {
@@ -49,7 +51,9 @@ hzr_do_rm_rdns () {
 	curl -s \
 		"$API_URL/servers/$SERVER/actions/change_dns_ptr" \
 		-H "Authorization: $AUTH_TOKEN" \
-		--json "$doc"
+		-H "Content-Type: application/json" \
+		-H "Accept: application/json" \
+		--data "$doc"
 }
 
 do_tail () {
