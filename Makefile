@@ -9,7 +9,8 @@ install:
 	mkdir -p ${PREFIX}/lib/systemd/system
 	mkdir -p ${PREFIX}/bin
 	install -m 644 traceroute-crawl.sample.conf ${PREFIX}/share/doc/traceroute-crawl
-	install -m 644 -b traceroute-crawl.sample.conf /etc/traceroute-crawl/traceroute-crawl.conf
+	test -f /etc/traceroute-crawl/traceroute-crawl.conf || \
+		install -m 644 traceroute-crawl.sample.conf /etc/traceroute-crawl/traceroute-crawl.conf
 	install -m 644 traceroute-crawl.service traceroute-crawl@.service ${PREFIX}/lib/systemd/system
 	install -m 755 traceroute-crawl.sh traceroute-crawl ${PREFIX}/bin
 	systemctl daemon-reload
