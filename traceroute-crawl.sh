@@ -12,6 +12,8 @@
 
 [ -z "$API_URL" ] && API_URL="https://api.hetzner.cloud/v1"
 [ -z "$API_RETRY" ] && API_RETRY=3
+[ -z "$NS_PREFIX" ] && NS_PREFIX=ns-
+[ -z "$HOP_PREFIX" ] && HOP_PREFIX=hop-
 
 hzr_apierr () {
 	err=$(jq -r ".error")
@@ -172,10 +174,10 @@ do_mkns () {
 	for ((i = 1; i <= depth; i++))
 	do
 		n=$(printf '%04x' $i)
-		ns[i]=ns-$n if[i]=hop-$n ip[i]=$PREFIX$n
+		ns[i]=$NS_PREFIX$n if[i]=$HOP_PREFIX$n ip[i]=$PREFIX$n
 	done
 	n=$(printf '%04x' $i)
-	ns[i]=ns-$n if[i]=hop-$n ip[i]=$TAIL_ADDR
+	ns[i]=$NS_PREFIX$n if[i]=$HOP_PREFIX$n ip[i]=$TAIL_ADDR
 	let 'depth += 1'
 
 	for ((i = 1; i <= depth; i++))
@@ -248,7 +250,7 @@ do_rmns () {
 	for (( i = 1; i <= depth; i += 1))
 	do
 		n=$(printf '%04x' $i)
-		ns[i]=ns-$n if[i]=hop-$n
+		ns[i]=$NS_PREFIX$n if[i]=$HOP_PREFIX$n
 	done
 
 	for (( i = depth; i > 0; i -= 1))
