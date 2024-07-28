@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=notify
-EnvironmentFile=/etc/traceroute-crawl/site.conf.d/%i
+EnvironmentFile=/etc/traceroute-crawl/site.conf.d/%i.conf
 ExecStart=/usr/local/bin/traceroute-crawl.sh daemon_ns
 KillSignal=SIGCONT
 
