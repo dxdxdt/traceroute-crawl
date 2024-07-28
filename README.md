@@ -68,9 +68,9 @@ traceroute to episode-iv.dev.snart.me (2a01:4f9:c011:9670::ffff), 128 hops max, 
 ```sh
 dnf install curl tar gzip jq ipcalc
 
-curl -L https://github.com/dxdxdt/traceroute-crawl/archive/refs/tags/r1.tar.gz > traceroute-crawl-r1.tar.gz
-tar xf traceroute-crawl-r1.tar.gz
-cd traceroute-crawl-r1
+curl -L https://github.com/dxdxdt/traceroute-crawl/archive/refs/tags/r2.tar.gz > traceroute-crawl-r2.tar.gz
+tar xf traceroute-crawl-r2.tar.gz
+cd traceroute-crawl-r2
 
 sudo make install
 ```
