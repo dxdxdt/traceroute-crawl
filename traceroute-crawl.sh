@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # https://stackoverflow.com/questions/34320429/simulating-network-hops-on-a-single-linux-box
 #
@@ -160,14 +160,14 @@ do_mkns () {
 	depth=$(echo "$PTR_LINES" | wc -l)
 
 	sysctl -qw \
-		"net.ipv4.conf.all.forwarding = 1" \
-		"net.ipv4.conf.default.forwarding = 1" \
-		"net.ipv4.ip_forward = 1" \
-		"net.ipv6.conf.default.forwarding = 1" \
-		"net.ipv6.conf.all.forwarding = 1" \
-		"net.ipv4.ip_default_ttl = $HOPLIMIT" \
-		"net.ipv6.conf.all.hop_limit = $HOPLIMIT" \
-		"net.ipv6.conf.default.hop_limit = $HOPLIMIT"
+		"net.ipv4.conf.all.forwarding=1" \
+		"net.ipv4.conf.default.forwarding=1" \
+		"net.ipv4.ip_forward=1" \
+		"net.ipv6.conf.default.forwarding=1" \
+		"net.ipv6.conf.all.forwarding=1" \
+		"net.ipv4.ip_default_ttl=$HOPLIMIT" \
+		"net.ipv6.conf.all.hop_limit=$HOPLIMIT" \
+		"net.ipv6.conf.default.hop_limit=$HOPLIMIT"
 
 	# instead of special casing things, if we bind init's netns into a name
 	# all of the code can use "-n ns"
@@ -189,14 +189,14 @@ do_mkns () {
 		ip -6 netns add ${ns[i]}
 		ip netns exec ${ns[i]} \
 			sysctl -qw \
-				"net.ipv4.conf.all.forwarding = 1" \
-				"net.ipv4.conf.default.forwarding = 1" \
-				"net.ipv4.ip_forward = 1" \
-				"net.ipv6.conf.default.forwarding = 1" \
-				"net.ipv6.conf.all.forwarding = 1" \
-				"net.ipv4.ip_default_ttl = $HOPLIMIT" \
-				"net.ipv6.conf.all.hop_limit = $HOPLIMIT" \
-				"net.ipv6.conf.default.hop_limit = $HOPLIMIT"
+				"net.ipv4.conf.all.forwarding=1" \
+				"net.ipv4.conf.default.forwarding=1" \
+				"net.ipv4.ip_forward=1" \
+				"net.ipv6.conf.default.forwarding=1" \
+				"net.ipv6.conf.all.forwarding=1" \
+				"net.ipv4.ip_default_ttl=$HOPLIMIT" \
+				"net.ipv6.conf.all.hop_limit=$HOPLIMIT" \
+				"net.ipv6.conf.default.hop_limit=$HOPLIMIT"
 		# interfaces are named by whom is on the other side
 		# so it's kinda flip-flopped looking.
 		ip -6 -n ${ns[i-1]} link add ${if[i]} type veth peer name ${if[i-1]} netns ${ns[i]}
@@ -264,7 +264,7 @@ do_rmns () {
 	done
 }
 
-do_daemon_ns () {
+do_daemon_ns_systemd () {
 	set_status () {
 		echo "$1" >&2
 		systemd-notify --status="$1"
@@ -281,6 +281,30 @@ do_daemon_ns () {
 	do_rmns
 
 	set_status ""
+}
+
+do_daemon_ns () {
+	set_status () {
+		echo "$1" >&2
+	}
+
+	mk_pidfile () {
+		if [ ! -z "$pidfile" ]; then
+			echo "$1" > "$pidfile"
+		fi
+	}
+
+	child_main () {
+		set_status "Stopped and holding netns"
+		kill -STOP 0
+		set_status "Deleting netns"
+
+		do_rmns
+	}
+
+	do_mkns
+	child_main &
+	mk_pidfile $!
 }
 
 do_dig () {

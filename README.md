@@ -73,6 +73,8 @@ tar xf traceroute-crawl-r2.tar.gz
 cd traceroute-crawl-r2
 
 sudo make install
+# Unload Systemd units
+systemctl daemon-reload
 ```
 
 Edit `/etc/traceroute-crawl/traceroute-crawl.conf`.
@@ -138,6 +140,8 @@ systemctl disable --now traceroute-crawl
 
 # Remove the executables
 sudo make uninstall
+# Unload Systemd units
+systemctl daemon-reload
 ```
 
 ## Tips

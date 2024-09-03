@@ -12,8 +12,8 @@ install:
 	test -f /etc/traceroute-crawl/traceroute-crawl.conf || \
 		install -m 644 traceroute-crawl.sample.conf /etc/traceroute-crawl/traceroute-crawl.conf
 	install -m 644 traceroute-crawl.service traceroute-crawl@.service ${PREFIX}/lib/systemd/system
+	install -m 755 traceroute-crawl.openrc /etc/init.d/traceroute-crawl
 	install -m 755 traceroute-crawl.sh traceroute-crawl ${PREFIX}/bin
-	systemctl daemon-reload
 
 uninstall:
 	rm -f \
@@ -21,4 +21,3 @@ uninstall:
 		${PREFIX}/bin/traceroute-crawl \
 		${PREFIX}/lib/systemd/system/traceroute-crawl.service \
 		${PREFIX}/lib/systemd/system/traceroute-crawl@.service
-	systemctl daemon-reload

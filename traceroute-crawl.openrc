@@ -1,0 +1,31 @@
+#!/sbin/openrc-run
+command="/usr/local/bin/traceroute-crawl.sh"
+command_args="daemon_ns"
+pidfile="/run/${SVCNAME}.pid"
+
+depend () {
+	after net
+	before iptables ip6tables
+}
+
+INSTANCE="${SVCNAME#*.}"
+if [ "$INSTANCE" == "$SVCNAME" ]; then
+	CONF="/etc/traceroute-crawl/traceroute-crawl.conf"
+else
+	CONF="/etc/traceroute-crawl/site.conf.d/$INSTANCE.conf"
+fi
+
+start_pre () {
+	. "$CONF"
+	export PREFIX
+	export PTR_LINES
+	export TAIL_ADDR
+	export HOPLIMIT
+	export NS_PREFIX
+	export HOP_PREFIX
+	export pidfile
+}
+
+stop () {
+	start-stop-daemon --stop -s CONT --pidfile "$pidfile"
+}
